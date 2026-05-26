@@ -15,7 +15,7 @@ export class EstudiantesController {
   @MessagePattern({ cmd: 'get_all_students' })
   async getAll() {
     const estudiante = await this.estudianteService.getAll();
-
+    console.log(estudiante);
     const datos = {
       data: estudiante,
       message: 'Lista de estudiantes obtenida con éxito',
