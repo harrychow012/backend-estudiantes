@@ -8,16 +8,17 @@ import {
   Delete,
 } from '@nestjs/common';
 import { RelacionesService } from './relaciones.service';
-import { CreateRelacioneDto } from './dto/create-relacione.dto';
-import { UpdateRelacioneDto } from './dto/update-relacione.dto';
+import { CreateRelacionesDto } from './dto/create-relacione.dto';
+import { UpdateRelacionesDto } from './dto/update-relacione.dto';
+import { MessagePattern } from '@nestjs/microservices';
 
 @Controller('relaciones')
 export class RelacionesController {
   constructor(private readonly relacionesService: RelacionesService) {}
 
   @Post()
-  create(@Body() createRelacioneDto: CreateRelacioneDto) {
-    return this.relacionesService.create(createRelacioneDto);
+  create(@Body() createRelacionesDto: CreateRelacionesDto) {
+    return this.relacionesService.create(createRelacionesDto);
   }
 
   @Get()
@@ -33,13 +34,27 @@ export class RelacionesController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateRelacioneDto: UpdateRelacioneDto,
+    @Body() updateRelacionesDto: UpdateRelacionesDto,
   ) {
-    return this.relacionesService.update(+id, updateRelacioneDto);
+    return this.relacionesService.update(+id, updateRelacionesDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.relacionesService.remove(+id);
+  }
+
+  @MessagePattern({ cmd: 'get_sexos' })
+  async getSexos() {
+    return {
+      data: await this.relacionesService.getSexos(),
+    };
+  }
+
+  @MessagePattern({ cmd: 'get_etnias' })
+  async getEtnias() {
+    return {
+      data: await this.relacionesService.getEtnias(),
+    };
   }
 }

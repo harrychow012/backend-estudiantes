@@ -10,12 +10,12 @@ export const DatabaseProvider: DynamicModule = TypeOrmModule.forRootAsync({
   useFactory: (configService: ConfigService) => ({
     type: 'postgres',
     host: configService.get('HOST'),
-    port: +configService.get('PORT_DB'),
+    port: +configService.get('PORT_DB') || 5433,
     username: configService.get('USERNAME_DB'),
     password: configService.get('PASSWORD_DB'),
     database: configService.get('DATABASE'),
     entities: [],
     autoLoadEntities: configService.get('AUTO_LOAD_ENTITIES'),
-    synchronize: false,
+    synchronize: true,
   }),
 });

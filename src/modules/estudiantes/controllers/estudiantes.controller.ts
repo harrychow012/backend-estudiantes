@@ -1,32 +1,43 @@
 import {
-  Body,
   Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
+  // Post,
 } from '@nestjs/common';
 import { EstudiantesServices } from '../services/estudiantes.service';
 import { CreateEstudianteDto } from '../dto/estudiantes.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { UpdateEstudianteDto } from '../dto/estudiantesUpdate.dto';
 
-@Controller('EStudiantes')
+@Controller('Estudiantes')
 export class EstudiantesController {
   constructor(private readonly estudianteService: EstudiantesServices) {}
 
-  @Get()
-  getAll() {
-    return this.estudianteService.getAll();
+  // @Get()
+  @MessagePattern({ cmd: 'get_all_students' })
+  async getAll() {
+    const estudiante = await this.estudianteService.getAll();
+
+    const datos = {
+      data: estudiante,
+      message: 'Lista de estudiantes obtenida con éxito',
+    };
+    return datos;
   }
 
-  @Get(':id')
-  getOne(@Param('id', ParseIntPipe) id: number) {
-    return this.estudianteService.getOne(id);
+  // @Get(':id')
+  @MessagePattern({ cmd: 'get_student' })
+  async getOne(@Payload() { id }: { id: number }) {
+    const estudiante = await this.estudianteService.getOne(id);
+
+    const datos = {
+      data: estudiante,
+      message: 'Estudiante obtenido con éxito',
+    };
+    return datos;
   }
 
-  @Post()
-  async create(@Body() estudianteDto: CreateEstudianteDto) {
+  // @Post()
+  @MessagePattern({ cmd: 'create_student' })
+  async create(@Payload() estudianteDto: CreateEstudianteDto) {
     const estudiante = await this.estudianteService.create(estudianteDto);
 
     const datos = {
@@ -36,21 +47,23 @@ export class EstudiantesController {
     return datos;
   }
 
-  @Patch(':id')
+  // @Patch(':id')
+  @MessagePattern({ cmd: 'update_student' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() estudianteDto: CreateEstudianteDto,
+    @Payload() data: { id: number; estudianteDto: UpdateEstudianteDto },
   ) {
+    const { id, estudianteDto } = data;
     const estudiante = await this.estudianteService.update(id, estudianteDto);
 
-    return {
+    const datos = {
       data: estudiante,
-      message: 'Registro actualizado con éxito',
+      message: 'Registro actualizado con exito',
     };
+    return datos;
   }
 
-  @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  @MessagePattern({ cmd: 'delete_student' })
+  async remove(@Payload() { id }: { id: number }) {
     const estudiante = await this.estudianteService.remove(id);
 
     return {

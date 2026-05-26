@@ -1,1 +1,1 @@
-export class CreateRelacioneDto {}
+export class CreateRelacionesDto {}

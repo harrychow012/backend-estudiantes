@@ -3,20 +3,40 @@ import { Estudiante } from '../entities/estudiantes.entity';
 import { Repository } from 'typeorm';
 import { CreateEstudianteDto } from '../dto/estudiantes.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Sexo } from 'src/modules/relaciones/entities/sexo.entity';
+import { Etnia } from 'src/modules/relaciones/entities/etnia.entity';
+import { UpdateEstudianteDto } from '../dto/estudiantesUpdate.dto';
 
 @Injectable()
 export class EstudiantesServices {
   constructor(
     @InjectRepository(Estudiante)
     private estudianteRepo: Repository<Estudiante>,
+
+    @InjectRepository(Sexo)
+    private sexoRepo: Repository<Sexo>,
+
+    @InjectRepository(Etnia)
+    private etniaRepo: Repository<Etnia>,
   ) {}
 
-  getAll() {
-    return `Endpoint para el geAll`;
+  async getAll() {
+    return await this.estudianteRepo.find({
+      relations: ['sexo', 'etnia'],
+    });
   }
 
-  getOne(id: number) {
-    return `Esto retorna el id ${id}`;
+  async getOne(id: number) {
+    const estudiante = await this.estudianteRepo.findOne({
+      where: { id },
+      relations: ['sexo', 'etnia'],
+    });
+
+    if (!estudiante) {
+      throw new NotFoundException('Estudiante no encontrado');
+    }
+
+    return estudiante;
   }
 
   async create(estudianteDto: CreateEstudianteDto) {
@@ -29,10 +49,23 @@ export class EstudiantesServices {
     }
   }
 
-  async update(id: number, estudianteDto: any) {
-    await this.estudianteRepo.update(id, estudianteDto);
+  async update(id: number, dto: UpdateEstudianteDto) {
+    const estudiante = await this.estudianteRepo.findOne({ where: { id } });
 
-    return await this.estudianteRepo.findOne({
+    if (!estudiante) {
+      throw new NotFoundException('Estudiante no encontrado');
+    }
+
+    await this.estudianteRepo.update(id, {
+      nombre: dto.nombre,
+      paterno: dto.paterno,
+      materno: dto.materno,
+      direccion: dto.direccion,
+      sexo: dto.sexo_id ? ({ id: dto.sexo_id } as any) : undefined,
+      etnia: dto.etnia_id ? ({ id: dto.etnia_id } as any) : undefined,
+    });
+
+    return this.estudianteRepo.findOne({
       where: { id },
       relations: ['sexo', 'etnia'],
     });

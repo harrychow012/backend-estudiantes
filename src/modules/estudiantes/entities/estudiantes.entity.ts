@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 import { Sexo } from '../../relaciones/entities/sexo.entity';
@@ -25,18 +26,18 @@ export class Estudiante {
   @Column({ type: 'varchar', nullable: true, length: 30 })
   materno: string;
 
-  @Column({ type: 'int4', nullable: false })
-  sexo_id: number;
-
   @Column({ type: 'varchar', nullable: true, length: 200 })
   direccion: string;
 
-  @Column({ type: 'int4', nullable: false })
-  etnia_id: number;
+  @Column({ name: 'sexo_id' })
+  sexo_id: number;
 
   @ManyToOne(() => Sexo, (sexo) => sexo.estudiantes)
   @JoinColumn({ name: 'sexo_id' })
   sexo: Sexo;
+
+  @Column({ name: 'etnia_id' })
+  etnia_id: number;
 
   @ManyToOne(() => Etnia, (etnia) => etnia.estudiantes)
   @JoinColumn({ name: 'etnia_id' })
@@ -47,4 +48,7 @@ export class Estudiante {
 
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
 }
