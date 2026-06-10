@@ -29,15 +29,9 @@ export class Estudiante {
   @Column({ type: 'varchar', nullable: true, length: 200 })
   direccion: string;
 
-  @Column({ name: 'sexo_id' })
-  sexo_id: number;
-
   @ManyToOne(() => Sexo, (sexo) => sexo.estudiantes)
   @JoinColumn({ name: 'sexo_id' })
   sexo: Sexo;
-
-  @Column({ name: 'etnia_id' })
-  etnia_id: number;
 
   @ManyToOne(() => Etnia, (etnia) => etnia.estudiantes)
   @JoinColumn({ name: 'etnia_id' })
